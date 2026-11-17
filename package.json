@@ -1,0 +1,33 @@
+{
+  "name": "simple-clock-card",
+  "version": "1.0.0",
+  "description": "Highly customizable Lovelace clock card for Home Assistant with full visual editor and multi-language support.",
+  "type": "module",
+  "main": "dist/simple-clock-card.js",
+  "scripts": {
+    "build": "rollup -c rollup.config.mjs",
+    "watch": "rollup -c rollup.config.mjs -w",
+    "typecheck": "tsc --noEmit",
+    "test": "node tests/verify.mjs"
+  },
+  "keywords": [
+    "home-assistant",
+    "lovelace",
+    "custom-card",
+    "clock",
+    "lit",
+    "hacs"
+  ],
+  "license": "MIT",
+  "devDependencies": {
+    "@rollup/plugin-node-resolve": "^16.0.0",
+    "@rollup/plugin-terser": "^0.4.4",
+    "@rollup/plugin-typescript": "^12.1.2",
+    "rollup": "^4.28.1",
+    "tslib": "^2.8.1",
+    "typescript": "^5.7.2"
+  },
+  "dependencies": {
+    "lit": "^3.2.1"
+  }
+}
