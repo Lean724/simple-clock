@@ -2,6 +2,8 @@
 
 A highly customizable Lovelace clock card for **Home Assistant** designed to be **100% configurable from the Visual Editor** — no YAML required.
 
+![Simple Clock Card Preview](images/preview.png)
+
 ## Features
 
 - **100% Visual Configuration**: Built with native Home Assistant `ha-selector` controls organized into expandable sections (`Clock`, `Date & Language`, `Status Entities (3)`, `Size & Typography`, `Colors & Transparency`).
