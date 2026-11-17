@@ -4,6 +4,11 @@ A highly customizable Lovelace clock card for **Home Assistant** designed to be 
 
 ![Simple Clock Card Preview](images/preview.png)
 
+### Transparent & Floating Dashboard Mode
+Seamlessly blend the clock directly into your dashboard background or wallpaper with 0% opacity, optional glassmorphism blur, and hidden borders:
+
+![Transparent Card Preview](images/transparent-preview.jpg)
+
 ## Features
 
 - **100% Visual Configuration**: Built with native Home Assistant `ha-selector` controls organized into expandable sections (`Clock`, `Date & Language`, `Status Entities (3)`, `Size & Typography`, `Colors & Transparency`).
