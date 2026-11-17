@@ -48,18 +48,21 @@ Seamlessly blend the clock directly into your dashboard background or wallpaper 
 
 ## Installation
 
+### Marketplace / HACS (Recommended)
+
+1. In Home Assistant, open **Marketplace** (via **Settings → Marketplace**) or **HACS**.
+2. Search for **Simple Clock Card**.
+3. Click **Download**.
+4. Reload your browser or dashboard resources when prompted.
+
 ### Manual Installation
+
 1. Download `simple-clock-card.js` (from the repository root or `dist/simple-clock-card.js`).
 2. Copy it into `<config>/www/simple-clock-card.js`.
 3. In Home Assistant, go to **Settings → Dashboards → Resources → Add Resource**:
    - URL: `/local/simple-clock-card.js`
    - Resource type: **JavaScript Module**
 4. Reload your browser and add **Simple Clock Card** from the visual card picker.
-
-### HACS (Custom Repository)
-1. In HACS, open **Frontend → Custom repositories**.
-2. Add this repository URL with category **Dashboard** (`Lovelace`).
-3. Install **Simple Clock Card** and reload resources.
 
 ---
 
