@@ -1,6 +1,6 @@
 # Simple Clock Card
 
-A highly customizable Lovelace clock card for **Home Assistant** designed to be **100% configurable from the Visual Editor** — no YAML required.
+A customizable **Home Assistant Lovelace clock card** with a real-time digital clock, date and status entities. It is fully configurable from the Home Assistant Visual Editor, with no YAML required.
 
 ![Simple Clock Card Preview](images/preview.png)
 
