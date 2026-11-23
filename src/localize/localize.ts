@@ -367,6 +367,7 @@ export interface TranslationStrings {
   section_entities: string;
   section_sizing_typography: string;
   section_colors_transparency: string;
+  section_interactions: string;
 
   // Clock fields
   time_mode: string;
@@ -425,6 +426,7 @@ export interface TranslationStrings {
   attribute_helper: string;
   custom_name: string;
   custom_icon: string;
+  entity_slot_icon_color: string;
   custom_unit: string;
   show_icon: string;
   show_name: string;
@@ -464,6 +466,18 @@ export interface TranslationStrings {
   hide_border: string;
   hide_shadow: string;
   reset_default: string;
+
+  // Interactions
+  tap_action: string;
+  double_tap_action: string;
+  hold_action: string;
+  action_none: string;
+  action_more_info: string;
+  action_toggle: string;
+  action_navigate: string;
+  action_url: string;
+  action_perform_action: string;
+  action_assist: string;
 }
 
 const en: TranslationStrings = {
@@ -477,6 +491,7 @@ const en: TranslationStrings = {
   section_entities: 'Status Entities (3)',
   section_sizing_typography: 'Size & Typography',
   section_colors_transparency: 'Colors & Transparency',
+  section_interactions: 'Interactions',
 
   time_mode: 'Time display',
   time_mode_h: 'Hours only (HH)',
@@ -532,6 +547,7 @@ const en: TranslationStrings = {
   attribute_helper: 'Leave empty to display the main state',
   custom_name: 'Custom name (optional)',
   custom_icon: 'Custom icon (optional)',
+  entity_slot_icon_color: 'Icon color (optional)',
   custom_unit: 'Custom unit (optional)',
   show_icon: 'Show icon',
   show_name: 'Show name',
@@ -569,6 +585,17 @@ const en: TranslationStrings = {
   hide_border: 'Hide card border',
   hide_shadow: 'Hide card shadow',
   reset_default: 'Reset to default',
+
+  tap_action: 'Tap action',
+  double_tap_action: 'Double tap action',
+  hold_action: 'Hold action',
+  action_none: 'No action',
+  action_more_info: 'More info',
+  action_toggle: 'Toggle',
+  action_navigate: 'Navigate',
+  action_url: 'Open URL',
+  action_perform_action: 'Perform action',
+  action_assist: 'Assist',
 };
 
 const es: TranslationStrings = {
@@ -582,6 +609,7 @@ const es: TranslationStrings = {
   section_entities: 'Entidades de Estado (3)',
   section_sizing_typography: 'Tamaño y Tipografía',
   section_colors_transparency: 'Colores y Transparencia',
+  section_interactions: 'Interacciones',
 
   time_mode: 'Visualización de la hora',
   time_mode_h: 'Solo horas (HH)',
@@ -637,6 +665,7 @@ const es: TranslationStrings = {
   attribute_helper: 'Dejar vacío para mostrar el estado principal',
   custom_name: 'Nombre personalizado (opcional)',
   custom_icon: 'Icono personalizado (opcional)',
+  entity_slot_icon_color: 'Color del icono (opcional)',
   custom_unit: 'Unidad personalizada (opcional)',
   show_icon: 'Mostrar icono',
   show_name: 'Mostrar nombre',
@@ -674,6 +703,17 @@ const es: TranslationStrings = {
   hide_border: 'Ocultar borde de la tarjeta',
   hide_shadow: 'Ocultar sombra de la tarjeta',
   reset_default: 'Restablecer',
+
+  tap_action: 'Acción al pulsar',
+  double_tap_action: 'Acción al pulsar dos veces',
+  hold_action: 'Acción al mantener pulsado',
+  action_none: 'Ninguna acción',
+  action_more_info: 'Más información',
+  action_toggle: 'Alternar',
+  action_navigate: 'Navegar',
+  action_url: 'Abrir URL',
+  action_perform_action: 'Ejecutar acción',
+  action_assist: 'Asistente',
 };
 
 const it: TranslationStrings = {
@@ -687,6 +727,7 @@ const it: TranslationStrings = {
   section_entities: 'Entità di Stato (3)',
   section_sizing_typography: 'Dimensioni e Tipografia',
   section_colors_transparency: 'Colori e Trasparenza',
+  section_interactions: 'Interazioni',
 
   time_mode: 'Visualizzazione ora',
   time_mode_h: 'Solo ore (HH)',
@@ -742,6 +783,7 @@ const it: TranslationStrings = {
   attribute_helper: 'Lascia vuoto per mostrare lo stato principale',
   custom_name: 'Nome personalizzato (opzionale)',
   custom_icon: 'Icona personalizzata (opzionale)',
+  entity_slot_icon_color: 'Colore icona (opzionale)',
   custom_unit: 'Unità personalizzata (opzionale)',
   show_icon: 'Mostra icona',
   show_name: 'Mostra nome',
@@ -779,6 +821,17 @@ const it: TranslationStrings = {
   hide_border: 'Nascondi bordo scheda',
   hide_shadow: 'Nascondi ombra scheda',
   reset_default: 'Ripristina',
+
+  tap_action: 'Azione al tocco',
+  double_tap_action: 'Azione al doppio tocco',
+  hold_action: 'Azione alla pressione prolungata',
+  action_none: 'Nessuna azione',
+  action_more_info: 'Ulteriori informazioni',
+  action_toggle: 'Attiva/Disattiva',
+  action_navigate: 'Naviga',
+  action_url: 'Apri URL',
+  action_perform_action: 'Esegui azione',
+  action_assist: 'Assist',
 };
 
 const pt: TranslationStrings = {
@@ -792,6 +845,7 @@ const pt: TranslationStrings = {
   section_entities: 'Entidades de Estado (3)',
   section_sizing_typography: 'Tamanho e Tipografia',
   section_colors_transparency: 'Cores e Transparência',
+  section_interactions: 'Interações',
 
   time_mode: 'Apresentação da hora',
   time_mode_h: 'Apenas horas (HH)',
@@ -847,6 +901,7 @@ const pt: TranslationStrings = {
   attribute_helper: 'Deixar vazio para mostrar o estado principal',
   custom_name: 'Nome personalizado (opcional)',
   custom_icon: 'Ícone personalizado (opcional)',
+  entity_slot_icon_color: 'Cor do ícone (opcional)',
   custom_unit: 'Unidade personalizada (opcional)',
   show_icon: 'Mostrar ícone',
   show_name: 'Mostrar nome',
@@ -884,6 +939,17 @@ const pt: TranslationStrings = {
   hide_border: 'Ocultar contorno do cartão',
   hide_shadow: 'Ocultar sombra do cartão',
   reset_default: 'Repor',
+
+  tap_action: 'Ação ao tocar',
+  double_tap_action: 'Ação ao tocar duas vezes',
+  hold_action: 'Ação ao manter premido',
+  action_none: 'Nenhuma ação',
+  action_more_info: 'Mais informações',
+  action_toggle: 'Alternar',
+  action_navigate: 'Navegar',
+  action_url: 'Abrir URL',
+  action_perform_action: 'Executar ação',
+  action_assist: 'Assistente',
 };
 
 const ptBR: TranslationStrings = {
@@ -897,6 +963,7 @@ const ptBR: TranslationStrings = {
   section_entities: 'Entidades de Status (3)',
   section_sizing_typography: 'Tamanho e Tipografia',
   section_colors_transparency: 'Cores e Transparência',
+  section_interactions: 'Interações',
 
   time_mode: 'Exibição da hora',
   time_mode_h: 'Somente horas (HH)',
@@ -952,6 +1019,7 @@ const ptBR: TranslationStrings = {
   attribute_helper: 'Deixe vazio para exibir o estado principal',
   custom_name: 'Nome personalizado (opcional)',
   custom_icon: 'Ícone personalizado (opcional)',
+  entity_slot_icon_color: 'Cor do ícone (opcional)',
   custom_unit: 'Unidade personalizada (opcional)',
   show_icon: 'Exibir ícone',
   show_name: 'Exibir nome',
@@ -989,6 +1057,17 @@ const ptBR: TranslationStrings = {
   hide_border: 'Ocultar borda do cartão',
   hide_shadow: 'Ocultar sombra do cartão',
   reset_default: 'Redefinir',
+
+  tap_action: 'Ação ao tocar',
+  double_tap_action: 'Ação ao tocar duas vezes',
+  hold_action: 'Ação ao pressionar e segurar',
+  action_none: 'Nenhuma ação',
+  action_more_info: 'Mais informações',
+  action_toggle: 'Alternar',
+  action_navigate: 'Navegar',
+  action_url: 'Abrir URL',
+  action_perform_action: 'Executar ação',
+  action_assist: 'Assistente',
 };
 
 const ru: TranslationStrings = {
@@ -1002,6 +1081,7 @@ const ru: TranslationStrings = {
   section_entities: 'Объекты состояния (3)',
   section_sizing_typography: 'Размер и шрифт',
   section_colors_transparency: 'Цвета и прозрачность',
+  section_interactions: 'Взаимодействия',
 
   time_mode: 'Отображение времени',
   time_mode_h: 'Только часы (ЧЧ)',
@@ -1057,6 +1137,7 @@ const ru: TranslationStrings = {
   attribute_helper: 'Оставьте пустым для основного состояния',
   custom_name: 'Своё имя (необязательно)',
   custom_icon: 'Своя иконка (необязательно)',
+  entity_slot_icon_color: 'Цвет иконки (необязательно)',
   custom_unit: 'Своя единица измерения (необязательно)',
   show_icon: 'Показывать иконку',
   show_name: 'Показывать имя',
@@ -1094,6 +1175,17 @@ const ru: TranslationStrings = {
   hide_border: 'Скрыть рамку карточки',
   hide_shadow: 'Скрыть тень карточки',
   reset_default: 'Сбросить',
+
+  tap_action: 'Действие при нажатии',
+  double_tap_action: 'Действие при двойном нажатии',
+  hold_action: 'Действие при удержании',
+  action_none: 'Нет действия',
+  action_more_info: 'Подробнее',
+  action_toggle: 'Переключить',
+  action_navigate: 'Перейти',
+  action_url: 'Открыть URL',
+  action_perform_action: 'Выполнить действие',
+  action_assist: 'Ассистент',
 };
 
 const de: TranslationStrings = {
@@ -1107,6 +1199,7 @@ const de: TranslationStrings = {
   section_entities: 'Status-Entitäten (3)',
   section_sizing_typography: 'Größe & Typografie',
   section_colors_transparency: 'Farben & Transparenz',
+  section_interactions: 'Interaktionen',
 
   time_mode: 'Zeitanzeige',
   time_mode_h: 'Nur Stunden (SS)',
@@ -1162,6 +1255,7 @@ const de: TranslationStrings = {
   attribute_helper: 'Leer lassen, um den Hauptzustand anzuzeigen',
   custom_name: 'Eigener Name (optional)',
   custom_icon: 'Eigenes Symbol (optional)',
+  entity_slot_icon_color: 'Symbolfarbe (optional)',
   custom_unit: 'Eigene Einheit (optional)',
   show_icon: 'Symbol anzeigen',
   show_name: 'Name anzeigen',
@@ -1199,6 +1293,17 @@ const de: TranslationStrings = {
   hide_border: 'Kartenrahmen ausblenden',
   hide_shadow: 'Kartenschatten ausblenden',
   reset_default: 'Zurücksetzen',
+
+  tap_action: 'Aktion beim Tippen',
+  double_tap_action: 'Aktion beim Doppeltippen',
+  hold_action: 'Aktion beim Gedrückthalten',
+  action_none: 'Keine Aktion',
+  action_more_info: 'Weitere Informationen',
+  action_toggle: 'Umschalten',
+  action_navigate: 'Navigieren',
+  action_url: 'URL öffnen',
+  action_perform_action: 'Aktion ausführen',
+  action_assist: 'Assist',
 };
 
 const fr: TranslationStrings = {
@@ -1212,6 +1317,7 @@ const fr: TranslationStrings = {
   section_entities: 'Entités d’état (3)',
   section_sizing_typography: 'Taille et Typographie',
   section_colors_transparency: 'Couleurs et Transparence',
+  section_interactions: 'Interactions',
 
   time_mode: 'Affichage de l’heure',
   time_mode_h: 'Heures uniquement (HH)',
@@ -1267,6 +1373,7 @@ const fr: TranslationStrings = {
   attribute_helper: 'Laisser vide pour afficher l’état principal',
   custom_name: 'Nom personnalisé (optionnel)',
   custom_icon: 'Icône personnalisée (optionnel)',
+  entity_slot_icon_color: 'Couleur de l’icône (optionnel)',
   custom_unit: 'Unité personnalisée (optionnel)',
   show_icon: 'Afficher l’icône',
   show_name: 'Afficher le nom',
@@ -1304,6 +1411,17 @@ const fr: TranslationStrings = {
   hide_border: 'Masquer la bordure',
   hide_shadow: 'Masquer l’ombre',
   reset_default: 'Réinitialiser',
+
+  tap_action: 'Action au toucher',
+  double_tap_action: 'Action au double toucher',
+  hold_action: 'Action à l’appui long',
+  action_none: 'Aucune action',
+  action_more_info: 'Plus d’informations',
+  action_toggle: 'Basculer',
+  action_navigate: 'Naviguer',
+  action_url: 'Ouvrir l’URL',
+  action_perform_action: 'Exécuter une action',
+  action_assist: 'Assist',
 };
 
 const zhHans: TranslationStrings = {
@@ -1316,6 +1434,7 @@ const zhHans: TranslationStrings = {
   section_entities: '状态实体 (3)',
   section_sizing_typography: '尺寸与字体',
   section_colors_transparency: '颜色与透明度',
+  section_interactions: '交互',
 
   time_mode: '时间显示模式',
   time_mode_h: '仅小时 (HH)',
@@ -1371,6 +1490,7 @@ const zhHans: TranslationStrings = {
   attribute_helper: '留空则显示实体的主状态',
   custom_name: '自定义名称（可选）',
   custom_icon: '自定义图标（可选）',
+  entity_slot_icon_color: '图标颜色（可选）',
   custom_unit: '自定义单位（可选）',
   show_icon: '显示图标',
   show_name: '显示名称',
@@ -1408,6 +1528,17 @@ const zhHans: TranslationStrings = {
   hide_border: '隐藏卡片边框',
   hide_shadow: '隐藏卡片阴影',
   reset_default: '恢复默认',
+
+  tap_action: '点击操作',
+  double_tap_action: '双击操作',
+  hold_action: '长按操作',
+  action_none: '无操作',
+  action_more_info: '更多信息',
+  action_toggle: '切换',
+  action_navigate: '导航',
+  action_url: '打开网址',
+  action_perform_action: '执行操作',
+  action_assist: '语音助手',
 };
 
 export const TRANSLATIONS: Record<ResolvedLanguage, TranslationStrings> = {

@@ -1,6 +1,6 @@
 {
   "name": "simple-clock-card",
-  "version": "1.0.0",
+  "version": "1.1.0-beta.1",
   "description": "Highly customizable Lovelace clock card for Home Assistant with full visual editor and multi-language support.",
   "type": "module",
   "main": "dist/simple-clock-card.js",

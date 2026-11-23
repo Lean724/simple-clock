@@ -2,6 +2,8 @@ import { LitElement, html, css, TemplateResult, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { styleMap } from 'lit/directives/style-map.js';
 import {
+  ActionTargetConfig,
+  ActionTrigger,
   DEFAULT_CONFIG,
   EntitySlotConfig,
   HomeAssistant,
@@ -11,6 +13,14 @@ import {
   SimpleClockCardConfig,
 } from './types';
 import { resolveLanguage } from './localize/localize';
+import {
+  ActionGestureController,
+  hasAction,
+  hasAnyAction,
+  resolveCardActionConfig,
+  resolveEntityActionConfig,
+  resolveEntityIconColor,
+} from './utils/action-handler';
 import {
   ResolvedEntityDisplay,
   colorToCss,
@@ -29,6 +39,7 @@ export class SimpleClockCard extends LitElement implements LovelaceCard {
   @state() private _now: Date = new Date();
 
   private _tickTimeout?: number;
+  private _gestureController = new ActionGestureController();
 
   public static async getConfigElement(): Promise<LovelaceCardEditor> {
     try {
@@ -104,6 +115,7 @@ export class SimpleClockCard extends LitElement implements LovelaceCard {
       window.clearTimeout(this._tickTimeout);
       this._tickTimeout = undefined;
     }
+    this._gestureController.destroy();
   }
 
   private _scheduleTick(): void {
@@ -118,14 +130,40 @@ export class SimpleClockCard extends LitElement implements LovelaceCard {
     }, msToNextSecond);
   }
 
-  private _openMoreInfo(entityId: string): void {
+  private _dispatchAction(
+    actionConfig: ActionTargetConfig,
+    action: ActionTrigger
+  ): void {
+    const triggerConfig =
+      action === 'tap'
+        ? actionConfig.tap_action
+        : action === 'double_tap'
+          ? actionConfig.double_tap_action
+          : actionConfig.hold_action;
+    if (!hasAction(triggerConfig)) return;
+
     this.dispatchEvent(
-      new CustomEvent('hass-more-info', {
-        detail: { entityId },
+      new CustomEvent('hass-action', {
+        detail: { config: actionConfig, action },
         bubbles: true,
         composed: true,
       })
     );
+  }
+
+  private _isEventFromInteractiveEntity(ev: Event): boolean {
+    const path = ev.composedPath?.() ?? [];
+    for (const node of path) {
+      if (
+        node instanceof Element &&
+        node.classList?.contains('entity-chip') &&
+        node.classList?.contains('interactive')
+      ) {
+        return true;
+      }
+    }
+    const target = ev.target as Element | null;
+    return Boolean(target?.closest?.('.entity-chip.interactive'));
   }
 
   private _renderClock(): TemplateResult {
@@ -211,13 +249,18 @@ export class SimpleClockCard extends LitElement implements LovelaceCard {
   ): TemplateResult | typeof nothing {
     if (!item.icon) return nothing;
 
-    const iconColor = colorToCss(this._config.entity_icon_color);
+    const iconColor = resolveEntityIconColor(
+      slot?.icon_color,
+      this._config.entity_icon_color
+    );
     const iconSize = Math.max(
       14,
       Math.round((this._config.entity_font_size ?? DEFAULT_CONFIG.entity_font_size) * 1.25)
     );
     const iconStyle = styleMap({
       color: iconColor ?? null,
+      '--state-icon-color': iconColor ?? null,
+      '--paper-item-icon-color': iconColor ?? null,
       '--mdc-icon-size': `${iconSize}px`,
     });
 
@@ -253,20 +296,26 @@ export class SimpleClockCard extends LitElement implements LovelaceCard {
     const hassLang = this.hass?.locale?.language || this.hass?.language;
     const lang = resolveLanguage(this._config.language, hassLang);
 
-    const slots: Array<EntitySlotConfig | undefined> = [
-      this._config.entity_1,
-      this._config.entity_2,
-      this._config.entity_3,
+    const slotEntries: Array<{ key: string; slot: EntitySlotConfig | undefined }> = [
+      { key: 'entity_1', slot: this._config.entity_1 },
+      { key: 'entity_2', slot: this._config.entity_2 },
+      { key: 'entity_3', slot: this._config.entity_3 },
     ];
 
-    const resolved = slots
-      .map((slot) => ({
+    const resolved = slotEntries
+      .map(({ key, slot }) => ({
+        key,
         slot,
         display: resolveEntityDisplay(this.hass, slot, lang),
       }))
       .filter(
-        (entry): entry is { slot: EntitySlotConfig | undefined; display: ResolvedEntityDisplay } =>
-          entry.display !== null
+        (
+          entry
+        ): entry is {
+          key: string;
+          slot: EntitySlotConfig | undefined;
+          display: ResolvedEntityDisplay;
+        } => entry.display !== null
       );
 
     if (resolved.length === 0) return nothing;
@@ -285,21 +334,59 @@ export class SimpleClockCard extends LitElement implements LovelaceCard {
 
     return html`
       <div class="entities-row" style=${rowStyle}>
-        ${resolved.map(({ slot, display }) => {
+        ${resolved.map(({ key, slot, display }) => {
           const valueText = display.unit
             ? `${display.value} ${display.unit}`
             : display.value;
+          const entityActionConfig = resolveEntityActionConfig(slot, display.entityId);
+          const interactive = hasAnyAction(entityActionConfig);
 
           return html`
             <div
-              class="entity-chip ${display.available ? '' : 'entity-unavailable'}"
-              role="button"
-              tabindex="0"
-              @click=${() => this._openMoreInfo(display.entityId)}
+              class="entity-chip ${interactive ? 'interactive' : ''} ${display.available ? '' : 'entity-unavailable'}"
+              role=${interactive ? 'button' : nothing}
+              tabindex=${interactive ? '0' : nothing}
+              @pointerdown=${(e: PointerEvent) => {
+                if (!interactive) return;
+                e.stopPropagation();
+                this._gestureController.handlePointerDown(
+                  e,
+                  key,
+                  entityActionConfig,
+                  (action) => this._dispatchAction(entityActionConfig, action)
+                );
+              }}
+              @pointermove=${(e: PointerEvent) => {
+                if (!interactive) return;
+                e.stopPropagation();
+                this._gestureController.handlePointerMove(e, key);
+              }}
+              @pointerup=${(e: PointerEvent) => {
+                if (!interactive) return;
+                e.stopPropagation();
+                this._gestureController.handlePointerUp(
+                  e,
+                  key,
+                  entityActionConfig,
+                  (action) => this._dispatchAction(entityActionConfig, action)
+                );
+              }}
+              @pointercancel=${(e: PointerEvent) => {
+                if (!interactive) return;
+                e.stopPropagation();
+                this._gestureController.handlePointerCancel(key);
+              }}
+              @contextmenu=${(e: Event) => {
+                if (!interactive) return;
+                e.stopPropagation();
+                this._gestureController.handleContextMenu(e, key, entityActionConfig);
+              }}
               @keydown=${(e: KeyboardEvent) => {
+                if (!interactive) return;
                 if (e.key === 'Enter' || e.key === ' ') {
                   e.preventDefault();
-                  this._openMoreInfo(display.entityId);
+                  e.stopPropagation();
+                  this._dispatchAction(entityActionConfig, 'tap');
                 }
               }}
             >
@@ -355,9 +442,47 @@ export class SimpleClockCard extends LitElement implements LovelaceCard {
 
     const datePos = this._config.date_position ?? DEFAULT_CONFIG.date_position;
     const entitiesPos = this._config.entities_position ?? DEFAULT_CONFIG.entities_position;
+    const cardActionConfig = resolveCardActionConfig(this._config);
+    const cardInteractive = hasAnyAction(cardActionConfig);
 
     return html`
-      <ha-card style=${styleMap(cardStyles)}>
+      <ha-card
+        class=${cardInteractive ? 'interactive' : ''}
+        style=${styleMap(cardStyles)}
+        role=${cardInteractive ? 'button' : nothing}
+        tabindex=${cardInteractive ? '0' : nothing}
+        @pointerdown=${(e: PointerEvent) => {
+          if (!cardInteractive || this._isEventFromInteractiveEntity(e)) return;
+          this._gestureController.handlePointerDown(e, 'card', cardActionConfig, (action) =>
+            this._dispatchAction(cardActionConfig, action)
+          );
+        }}
+        @pointermove=${(e: PointerEvent) => {
+          if (!cardInteractive) return;
+          this._gestureController.handlePointerMove(e, 'card');
+        }}
+        @pointerup=${(e: PointerEvent) => {
+          if (!cardInteractive || this._isEventFromInteractiveEntity(e)) return;
+          this._gestureController.handlePointerUp(e, 'card', cardActionConfig, (action) =>
+            this._dispatchAction(cardActionConfig, action)
+          );
+        }}
+        @pointercancel=${() => {
+          if (!cardInteractive) return;
+          this._gestureController.handlePointerCancel('card');
+        }}
+        @contextmenu=${(e: Event) => {
+          if (!cardInteractive || this._isEventFromInteractiveEntity(e)) return;
+          this._gestureController.handleContextMenu(e, 'card', cardActionConfig);
+        }}
+        @keydown=${(e: KeyboardEvent) => {
+          if (!cardInteractive || this._isEventFromInteractiveEntity(e)) return;
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            this._dispatchAction(cardActionConfig, 'tap');
+          }
+        }}
+      >
         ${entitiesPos === 'top' ? this._renderEntities() : nothing}
         ${datePos === 'top' ? this._renderDate() : nothing}
         ${this._renderClock()}
@@ -381,6 +506,16 @@ export class SimpleClockCard extends LitElement implements LovelaceCard {
       justify-content: center;
       overflow: hidden;
       transition: background 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    ha-card.interactive {
+      cursor: pointer;
+      user-select: none;
+    }
+
+    ha-card.interactive:focus-visible {
+      outline: 2px solid var(--primary-color, #03a9f4);
+      outline-offset: -2px;
     }
 
     .clock-wrapper {
@@ -465,15 +600,19 @@ export class SimpleClockCard extends LitElement implements LovelaceCard {
       display: inline-flex;
       align-items: center;
       gap: 5px;
-      cursor: pointer;
       padding: 2px 6px;
       border-radius: 999px;
       transition: background-color 0.15s ease;
       line-height: 1.3;
+      user-select: none;
     }
 
-    .entity-chip:hover,
-    .entity-chip:focus-visible {
+    .entity-chip.interactive {
+      cursor: pointer;
+    }
+
+    .entity-chip.interactive:hover,
+    .entity-chip.interactive:focus-visible {
       background-color: var(--secondary-background-color, rgba(127, 127, 127, 0.14));
       outline: none;
     }
