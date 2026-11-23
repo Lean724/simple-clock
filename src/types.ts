@@ -35,15 +35,53 @@ export type FontFamilyOption =
 
 export type ColorValue = string | number[];
 
+export type ActionType =
+  | 'more-info'
+  | 'toggle'
+  | 'perform-action'
+  | 'call-service'
+  | 'navigate'
+  | 'url'
+  | 'assist'
+  | 'none';
+
+export interface ActionConfig {
+  action: ActionType | string;
+  navigation_path?: string;
+  navigation_replace?: boolean;
+  url_path?: string;
+  perform_action?: string;
+  service?: string;
+  target?: Record<string, unknown>;
+  data?: Record<string, unknown>;
+  service_data?: Record<string, unknown>;
+  confirmation?: boolean | { text?: string; exemptions?: Array<{ user: string }> };
+  pipeline_id?: string;
+  start_listening?: boolean;
+}
+
+export type ActionTrigger = 'tap' | 'double_tap' | 'hold';
+
+export interface ActionTargetConfig {
+  entity?: string;
+  tap_action?: ActionConfig;
+  double_tap_action?: ActionConfig;
+  hold_action?: ActionConfig;
+}
+
 export interface EntitySlotConfig {
   entity?: string;
   attribute?: string;
   name?: string;
   icon?: string;
+  icon_color?: ColorValue;
   unit?: string;
   show_icon?: boolean;
   show_name?: boolean;
   show_unit?: boolean;
+  tap_action?: ActionConfig;
+  double_tap_action?: ActionConfig;
+  hold_action?: ActionConfig;
 }
 
 export interface SimpleClockCardConfig {
@@ -102,6 +140,11 @@ export interface SimpleClockCardConfig {
   hide_border?: boolean;
   hide_shadow?: boolean;
   border_radius?: number;
+
+  // 6. Interactions
+  tap_action?: ActionConfig;
+  double_tap_action?: ActionConfig;
+  hold_action?: ActionConfig;
 }
 
 export interface HassEntity {
@@ -183,6 +226,9 @@ export const DEFAULT_CONFIG: Required<
     | 'entity_icon_color'
     | 'background_color'
     | 'border_radius'
+    | 'tap_action'
+    | 'double_tap_action'
+    | 'hold_action'
   >
 > &
   Pick<
@@ -197,6 +243,9 @@ export const DEFAULT_CONFIG: Required<
     | 'entity_icon_color'
     | 'background_color'
     | 'border_radius'
+    | 'tap_action'
+    | 'double_tap_action'
+    | 'hold_action'
   > = {
   type: 'custom:simple-clock-card',
 
@@ -253,4 +302,9 @@ export const DEFAULT_CONFIG: Required<
   hide_border: false,
   hide_shadow: false,
   border_radius: undefined,
+
+  // Interactions
+  tap_action: undefined,
+  double_tap_action: undefined,
+  hold_action: undefined,
 };

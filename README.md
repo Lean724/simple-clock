@@ -11,7 +11,7 @@ Seamlessly blend the clock directly into your dashboard background or wallpaper 
 
 ## Features
 
-- **100% Visual Configuration**: Built with native Home Assistant `ha-selector` controls organized into expandable sections (`Clock`, `Date & Language`, `Status Entities (3)`, `Size & Typography`, `Colors & Transparency`).
+- **100% Visual Configuration**: Built with native Home Assistant `ha-selector` controls organized into expandable sections (`Clock`, `Date & Language`, `Status Entities (3)`, `Size & Typography`, `Colors & Transparency`, `Interactions`).
 - **Flexible Time Display**:
   - Hours only (`HH`), Hours & Minutes (`HH:MM`), or Hours, Minutes & Seconds (`HH:MM:SS`).
   - Seconds style: same size inline, small superscript, or small subscript.
@@ -37,8 +37,11 @@ Seamlessly blend the clock directly into your dashboard background or wallpaper 
 - **3 Status Entity Slots**:
   - Up to 3 optional status chips placed above or below the clock.
   - Pick any entity **and optionally select any entity attribute** (for example `temperature` or `humidity` from a `weather.*` entity).
-  - Customize icon, name, unit, and visibility toggles per slot.
-  - Clicking an entity opens Home Assistant's `more-info` dialog.
+  - Customize icon, per-entity `icon_color` (falling back to the global `entity_icon_color`), name, unit, and visibility toggles per slot.
+  - Configure independent `tap_action`, `double_tap_action`, and `hold_action` for each entity slot (`tap_action` defaults to `more-info`).
+- **Card-Level Interactions**:
+  - Configure `tap_action`, `double_tap_action`, and `hold_action` on the entire card (`more-info`, `toggle`, `navigate`, `url`, `perform-action`, `assist`, or `none`).
+  - Interactive entity chips isolate pointer and keyboard events so tapping an entity never triggers card-level actions simultaneously.
 - **Size, Typography, Colors & Transparency**:
   - Independent sliders for card padding, minimum height, clock size, seconds/AM-PM size, date size, entity size, spacing, corner radius, alignment, font weight, and font style.
   - Supports Home Assistant **Sections** grid resizing (`getGridOptions`).

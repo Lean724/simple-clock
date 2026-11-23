@@ -1,6 +1,9 @@
 import { LitElement, html, css, TemplateResult, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import {
+  ActionConfig,
+  ActionType,
+  ColorValue,
   DEFAULT_CONFIG,
   DEFAULT_ENTITY_SLOT,
   EntitySlotConfig,
@@ -254,6 +257,40 @@ export class SimpleClockCardEditor extends LitElement implements LovelaceCardEdi
       `;
     }
 
+    if ('ui_action' in selector) {
+      const uiCfg = selector.ui_action as { default_action?: ActionType };
+      const currentAction =
+        (value as ActionConfig | undefined)?.action ?? uiCfg.default_action ?? 'none';
+      const actionOptions: Array<{ value: string; label: string }> = [
+        { value: 'none', label: this._t('action_none') },
+        { value: 'more-info', label: this._t('action_more_info') },
+        { value: 'toggle', label: this._t('action_toggle') },
+        { value: 'navigate', label: this._t('action_navigate') },
+        { value: 'url', label: this._t('action_url') },
+        { value: 'perform-action', label: this._t('action_perform_action') },
+        { value: 'assist', label: this._t('action_assist') },
+      ];
+      return html`
+        <label class="fallback-field">
+          <span>${label}</span>
+          <select
+            .value=${currentAction}
+            @change=${(e: Event) => {
+              const selected = (e.target as HTMLSelectElement).value;
+              onChange(selected === uiCfg.default_action ? undefined : { action: selected });
+            }}
+          >
+            ${actionOptions.map(
+              (opt) =>
+                html`<option value=${opt.value} ?selected=${currentAction === opt.value}>
+                  ${opt.label}
+                </option>`
+            )}
+          </select>
+        </label>
+      `;
+    }
+
     return html`
       <label class="fallback-field">
         <span>${label}</span>
@@ -267,11 +304,11 @@ export class SimpleClockCardEditor extends LitElement implements LovelaceCardEdi
     `;
   }
 
-  private _renderColorField(
-    key: 'clock_color' | 'date_color' | 'entity_color' | 'entity_icon_color' | 'background_color',
-    label: string
+  private _renderColorPicker(
+    label: string,
+    rawValue: ColorValue | undefined,
+    onChange: (val: ColorValue | undefined) => void
   ): TemplateResult {
-    const rawValue = this._config[key];
     const rgbValue = parseColorToRgb(rawValue) ?? undefined;
     const hasCustomValue = rawValue !== undefined && rawValue !== '';
 
@@ -279,7 +316,7 @@ export class SimpleClockCardEditor extends LitElement implements LovelaceCardEdi
       <div class="color-row">
         <div class="color-selector">
           ${this._renderSelector(label, { color_rgb: {} }, rgbValue, (val) => {
-            this._updateField(key, val as number[] | undefined);
+            onChange(val as number[] | undefined);
           })}
         </div>
         ${hasCustomValue
@@ -288,7 +325,7 @@ export class SimpleClockCardEditor extends LitElement implements LovelaceCardEdi
                 type="button"
                 class="reset-btn"
                 title=${this._t('reset_default')}
-                @click=${() => this._updateField(key, undefined)}
+                @click=${() => onChange(undefined)}
               >
                 ↺
               </button>
@@ -296,6 +333,29 @@ export class SimpleClockCardEditor extends LitElement implements LovelaceCardEdi
           : nothing}
       </div>
     `;
+  }
+
+  private _renderColorField(
+    key: 'clock_color' | 'date_color' | 'entity_color' | 'entity_icon_color' | 'background_color',
+    label: string
+  ): TemplateResult {
+    return this._renderColorPicker(label, this._config[key], (val) =>
+      this._updateField(key, val)
+    );
+  }
+
+  private _renderActionSelector(
+    label: string,
+    value: ActionConfig | undefined,
+    defaultAction: ActionType,
+    onChange: (val: ActionConfig | undefined) => void
+  ): TemplateResult {
+    return this._renderSelector(
+      label,
+      { ui_action: { default_action: defaultAction } },
+      value,
+      (val) => onChange((val as ActionConfig | undefined) ?? undefined)
+    );
   }
 
   private _renderPanel(
@@ -689,6 +749,12 @@ export class SimpleClockCardEditor extends LitElement implements LovelaceCardEdi
                 (val) => this._updateEntitySlot(slotKey, 'icon', val)
               )}
 
+              ${this._renderColorPicker(
+                this._t('entity_slot_icon_color'),
+                slot.icon_color,
+                (val) => this._updateEntitySlot(slotKey, 'icon_color', val)
+              )}
+
               <div class="three-col">
                 ${this._renderSelector(
                   this._t('show_icon'),
@@ -709,6 +775,25 @@ export class SimpleClockCardEditor extends LitElement implements LovelaceCardEdi
                   (val) => this._updateEntitySlot(slotKey, 'show_unit', Boolean(val))
                 )}
               </div>
+
+              ${this._renderActionSelector(
+                this._t('tap_action'),
+                slot.tap_action,
+                'more-info',
+                (val) => this._updateEntitySlot(slotKey, 'tap_action', val)
+              )}
+              ${this._renderActionSelector(
+                this._t('double_tap_action'),
+                slot.double_tap_action,
+                'none',
+                (val) => this._updateEntitySlot(slotKey, 'double_tap_action', val)
+              )}
+              ${this._renderActionSelector(
+                this._t('hold_action'),
+                slot.hold_action,
+                'none',
+                (val) => this._updateEntitySlot(slotKey, 'hold_action', val)
+              )}
             `
           : nothing}
       `
@@ -944,6 +1029,32 @@ export class SimpleClockCardEditor extends LitElement implements LovelaceCardEdi
     );
   }
 
+  private _renderInteractionsSection(): TemplateResult {
+    return this._renderPanel(
+      this._t('section_interactions'),
+      html`
+        ${this._renderActionSelector(
+          this._t('tap_action'),
+          this._config.tap_action,
+          'none',
+          (val) => this._updateField('tap_action', val)
+        )}
+        ${this._renderActionSelector(
+          this._t('double_tap_action'),
+          this._config.double_tap_action,
+          'none',
+          (val) => this._updateField('double_tap_action', val)
+        )}
+        ${this._renderActionSelector(
+          this._t('hold_action'),
+          this._config.hold_action,
+          'none',
+          (val) => this._updateField('hold_action', val)
+        )}
+      `
+    );
+  }
+
   protected render(): TemplateResult {
     if (!this._config) {
       return html`${nothing}`;
@@ -959,6 +1070,7 @@ export class SimpleClockCardEditor extends LitElement implements LovelaceCardEdi
         ${this._renderEntitiesSection()}
         ${this._renderSizingTypographySection()}
         ${this._renderColorsTransparencySection()}
+        ${this._renderInteractionsSection()}
       </div>
     `;
   }

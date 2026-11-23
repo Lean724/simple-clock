@@ -12,6 +12,7 @@ function compileForTest(outDir) {
     resolve(ROOT, 'src/types.ts'),
     resolve(ROOT, 'src/localize/localize.ts'),
     resolve(ROOT, 'src/utils/date-time.ts'),
+    resolve(ROOT, 'src/utils/action-handler.ts'),
   ];
 
   const compilerOptions = {
@@ -68,6 +69,7 @@ async function runTests() {
 
     const localizeMod = await import(pathToFileURL(join(tempOut, 'localize/localize.js')).href);
     const dtMod = await import(pathToFileURL(join(tempOut, 'utils/date-time.js')).href);
+    const actionMod = await import(pathToFileURL(join(tempOut, 'utils/action-handler.js')).href);
 
     const {
       TRANSLATIONS,
@@ -82,6 +84,13 @@ async function runTests() {
       parseColorToRgb,
       resolveEntityDisplay,
     } = dtMod;
+    const {
+      hasAction,
+      hasAnyAction,
+      resolveCardActionConfig,
+      resolveEntityActionConfig,
+      resolveEntityIconColor,
+    } = actionMod;
 
     console.log('2. Verifying multi-language support (9 languages)...');
     const expectedLanguages = ['en', 'es', 'it', 'pt', 'pt-BR', 'ru', 'de', 'fr', 'zh-Hans'];
@@ -430,7 +439,103 @@ async function runTests() {
       assert.equal(missingAttr?.value, localize('unavailable', 'es'));
     });
 
-    console.log('7. Verifying built output bundles...');
+    console.log('7. Verifying card & entity actions and per-entity icon color...');
+    check('hasAction and hasAnyAction evaluate action configurations accurately', () => {
+      assert.equal(hasAction(undefined), false);
+      assert.equal(hasAction({ action: 'none' }), false);
+      assert.equal(hasAction({ action: '' }), false);
+      assert.equal(hasAction({ action: 'more-info' }), true);
+      assert.equal(hasAction({ action: 'navigate', navigation_path: '/lovelace/0' }), true);
+      assert.equal(hasAction({ action: 'perform-action', perform_action: 'light.toggle' }), true);
+
+      assert.equal(
+        hasAnyAction({
+          tap_action: { action: 'none' },
+          double_tap_action: { action: 'none' },
+          hold_action: { action: 'none' },
+        }),
+        false
+      );
+      assert.equal(
+        hasAnyAction({
+          tap_action: { action: 'none' },
+          hold_action: { action: 'toggle' },
+        }),
+        true
+      );
+    });
+
+    check('resolveCardActionConfig defaults to none and preserves configured actions', () => {
+      const defaultCard = resolveCardActionConfig({ type: 'custom:simple-clock-card' });
+      assert.deepEqual(defaultCard, {
+        tap_action: { action: 'none' },
+        double_tap_action: { action: 'none' },
+        hold_action: { action: 'none' },
+      });
+      assert.equal(hasAnyAction(defaultCard), false);
+
+      const configuredCard = resolveCardActionConfig({
+        type: 'custom:simple-clock-card',
+        tap_action: { action: 'navigate', navigation_path: '/lovelace/weather' },
+        double_tap_action: { action: 'perform-action', perform_action: 'homeassistant.restart' },
+        hold_action: { action: 'url', url_path: 'https://example.com' },
+      });
+      assert.equal(configuredCard.tap_action?.action, 'navigate');
+      assert.equal(configuredCard.tap_action?.navigation_path, '/lovelace/weather');
+      assert.equal(configuredCard.double_tap_action?.action, 'perform-action');
+      assert.equal(configuredCard.hold_action?.action, 'url');
+      assert.equal(hasAnyAction(configuredCard), true);
+    });
+
+    check('resolveEntityActionConfig defaults tap to more-info and honors explicit overrides', () => {
+      const defaultSlot = resolveEntityActionConfig(
+        { entity: 'sensor.living_temp' },
+        'sensor.living_temp'
+      );
+      assert.deepEqual(defaultSlot, {
+        entity: 'sensor.living_temp',
+        tap_action: { action: 'more-info' },
+        double_tap_action: { action: 'none' },
+        hold_action: { action: 'none' },
+      });
+      assert.equal(hasAnyAction(defaultSlot), true);
+
+      const disabledSlot = resolveEntityActionConfig(
+        {
+          entity: 'sensor.living_temp',
+          tap_action: { action: 'none' },
+        },
+        'sensor.living_temp'
+      );
+      assert.equal(disabledSlot.tap_action?.action, 'none');
+      assert.equal(hasAnyAction(disabledSlot), false);
+
+      const customSlot = resolveEntityActionConfig(
+        {
+          entity: 'light.kitchen',
+          tap_action: { action: 'toggle' },
+          double_tap_action: { action: 'more-info' },
+          hold_action: { action: 'navigate', navigation_path: '/lovelace/lights' },
+        },
+        'light.kitchen'
+      );
+      assert.equal(customSlot.entity, 'light.kitchen');
+      assert.equal(customSlot.tap_action?.action, 'toggle');
+      assert.equal(customSlot.double_tap_action?.action, 'more-info');
+      assert.equal(customSlot.hold_action?.action, 'navigate');
+    });
+
+    check('resolveEntityIconColor prefers slot color, falls back to global, or returns undefined', () => {
+      assert.equal(
+        resolveEntityIconColor([255, 100, 0], [0, 128, 255]),
+        'rgb(255, 100, 0)'
+      );
+      assert.equal(resolveEntityIconColor('#ff5500', [0, 128, 255]), 'rgb(255, 85, 0)');
+      assert.equal(resolveEntityIconColor(undefined, [0, 128, 255]), 'rgb(0, 128, 255)');
+      assert.equal(resolveEntityIconColor(undefined, undefined), undefined);
+    });
+
+    console.log('8. Verifying built output bundles...');
     check('dist/simple-clock-card.js and simple-clock-card.js exist and match', () => {
       const distPath = resolve(ROOT, 'dist/simple-clock-card.js');
       const rootPath = resolve(ROOT, 'simple-clock-card.js');
